@@ -104,7 +104,7 @@ public class ClienteRestController {
 			 clienteUpdated = clienteService.save(clienteActual);
 			 
 		 } catch (DataAccessException e) {
-			 response.put("mensaje", "Error al actualizar el cleinte en la base de datos");
+			 response.put("mensaje", "Error al actualizar el cliente en la base de datos");
 			 response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
 			 return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		 }
@@ -125,7 +125,7 @@ public class ClienteRestController {
 		 try {
 			 clienteService.delete(id);
 		 } catch (DataAccessException e) {
-			 response.put("mensaje", "Error al eliminar el cleinte en la base de datos");
+			 response.put("mensaje", "Error al eliminar el cliente en la base de datos");
 			 response.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
 			 return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		 }
