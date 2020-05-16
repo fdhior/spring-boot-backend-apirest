@@ -1,6 +1,9 @@
 package com.bolsadeideas.springboot.backend.apirest.controllers;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,8 +27,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bolsadeideas.springboot.backend.apirest.models.entity.Cliente;
 import com.bolsadeideas.springboot.backend.apirest.models.services.IClienteService;
@@ -180,6 +184,36 @@ public class ClienteRestController {
 		 
 	 }
 	 
+	 @PostMapping("/clientes/upload") 
+	 public ResponseEntity<?> upload(@RequestParam("archivo") MultipartFile archivo, @RequestParam("id") Long id) {
+		 Map<String, Object> response = new HashMap<>();
+		 
+		 Cliente cliente = clienteService.findById(id);		
+		 
+		 if (!archivo.isEmpty()) {
+			 String nombreArchivo = archivo.getOriginalFilename();
+			 Path rutaArchivo = Paths.get("uploads").resolve(nombreArchivo).toAbsolutePath();
+
+			 try {
+				Files.copy(archivo.getInputStream(), rutaArchivo);
+			} catch (IOException e) {
+				response.put("mensaje", "error al subir la imagen del cliente " + nombreArchivo);
+				response.put("error", e.getMessage().concat(": ").concat(e.getCause().getMessage()));
+				return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+
+			 cliente.setFoto(nombreArchivo);
+			 
+			 clienteService.save(cliente);
+			 
+			 response.put("cliente", cliente);
+			 response.put("mensaje", "Has subido correctamente la imagen: " + nombreArchivo);
+			 
+		 }
+		 
+		 return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+		 
+	 }
 	 
 	 
 	 
